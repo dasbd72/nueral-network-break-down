@@ -4,14 +4,17 @@ import numpy as np
 class Linear:
     def __init__(self, in_features: int, out_features: int):
         """Creates a Linear layer with in_features input features and out_features output features.
+        Initializes the weights using He initialization and sets the biases to zero. (Important !!!)
 
         :param int in_features: number of input features
         :param int out_features: number of output features
         """
         self.in_features = in_features
         self.out_features = out_features
-        self.weight = np.random.randn(out_features, in_features)
-        self.bias = np.random.randn(out_features)
+        self.weight = np.random.randn(out_features, in_features) * np.sqrt(
+            2.0 / in_features
+        )  # He initialization
+        self.bias = np.zeros(out_features)
         self.grad_weight = np.zeros_like(self.weight)
         self.grad_bias = np.zeros_like(self.bias)
         self.input = None
