@@ -70,8 +70,8 @@ class TestLinear(unittest.TestCase):
         layer = Linear(3, 2)
         layer.weight = w.copy()
         layer.bias = b.copy()
-        layer.grad_weight = g_w.copy()
-        layer.grad_bias = g_b.copy()
+        layer.weight_param.grad = g_w.copy()
+        layer.bias_param.grad = g_b.copy()
         layer.update(lr)
         np.testing.assert_array_almost_equal(layer.weight, w - lr * g_w)
         np.testing.assert_array_almost_equal(layer.bias, b - lr * g_b)
@@ -95,13 +95,15 @@ class TestLinear(unittest.TestCase):
         b = np.array([7, 8], dtype=np.float64)
 
         layer = Linear(3, 2)
-        layer.grad_weight = w.copy()
-        layer.grad_bias = b.copy()
+        layer.weight_param.grad = w.copy()
+        layer.bias_param.grad = b.copy()
         layer.zero_grad()
         np.testing.assert_array_almost_equal(
-            layer.grad_weight, np.zeros_like(w)
+            layer.weight_param.grad, np.zeros_like(w)
         )
-        np.testing.assert_array_almost_equal(layer.grad_bias, np.zeros_like(b))
+        np.testing.assert_array_almost_equal(
+            layer.bias_param.grad, np.zeros_like(b)
+        )
 
 
 if __name__ == "__main__":

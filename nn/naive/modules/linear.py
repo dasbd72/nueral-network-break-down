@@ -1,5 +1,7 @@
 import numpy as np
 
+from .parameter import Parameter
+
 
 class Linear:
     def __init__(self, in_features: int, out_features: int):
@@ -15,8 +17,8 @@ class Linear:
             2.0 / in_features
         )  # He initialization
         self.bias = np.zeros(out_features)
-        self.grad_weight = np.zeros_like(self.weight)
-        self.grad_bias = np.zeros_like(self.bias)
+        self.weight_param = Parameter(self.weight, name="linear_weight")
+        self.bias_param = Parameter(self.bias, name="linear_bias")
         self.input = None
 
     def __call__(self, x: np.ndarray) -> np.ndarray:
@@ -45,19 +47,22 @@ class Linear:
         :return: gradient tensor of shape (batch_size, in_features)
         :rtype: np.ndarray
         """
-        self.grad_weight = np.dot(grad_output.T, self.input)
-        self.grad_bias = np.sum(grad_output, axis=0)
+        self.weight_param.grad = np.dot(grad_output.T, self.input)
+        self.bias_param.grad = np.sum(grad_output, axis=0)
         return np.dot(grad_output, self.weight)
-
-    def update(self, lr: float) -> None:
-        """Updates the weights and biases of the layer.
-
-        :param float lr: learning rate
-        """
-        self.weight -= lr * self.grad_weight
-        self.bias -= lr * self.grad_bias
 
     def zero_grad(self):
         """Resets the gradient tensors to zero."""
-        self.grad_weight.fill(0)
-        self.grad_bias.fill(0)
+        self.weight_param.zero_grad()
+        self.bias_param.zero_grad()
+
+    def parameters(self):
+        """Returns the layer parameters.
+
+        :return: list of parameters
+        :rtype: list[Parameter]
+        """
+        return [
+            self.weight_param,
+            self.bias_param,
+        ]
